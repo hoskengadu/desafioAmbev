@@ -16,7 +16,11 @@ public sealed class SalesController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateSaleCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value) : BadRequest(result.Error);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : result.Error?.Contains("already exists", StringComparison.OrdinalIgnoreCase) == true
+                ? Conflict(result.Error)
+                : BadRequest(result.Error);
     }
 
     [HttpGet]
@@ -42,17 +46,33 @@ public sealed class SalesController : ControllerBase
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSaleCommand command, CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(command with { Id = id }, cancellationToken));
+    {
+        var result = await _mediator.Send(command with { Id = id }, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : result.Error?.Contains("already exists", StringComparison.OrdinalIgnoreCase) == true
+                ? Conflict(result.Error)
+                : NotFound(result.Error);
+    }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(new DeleteSaleCommand(id), cancellationToken));
+    {
+        var result = await _mediator.Send(new DeleteSaleCommand(id), cancellationToken);
+        return result.IsSuccess ? NoContent() : NotFound(result.Error);
+    }
 
     [HttpPatch("{id:guid}/cancel")]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(new CancelSaleCommand(id), cancellationToken));
+    {
+        var result = await _mediator.Send(new CancelSaleCommand(id), cancellationToken);
+        return result.IsSuccess ? NoContent() : NotFound(result.Error);
+    }
 
     [HttpPatch("{id:guid}/items/{itemId:guid}/cancel")]
     public async Task<IActionResult> CancelItem(Guid id, Guid itemId, CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(new CancelSaleItemCommand(id, itemId), cancellationToken));
+    {
+        var result = await _mediator.Send(new CancelSaleItemCommand(id, itemId), cancellationToken);
+        return result.IsSuccess ? NoContent() : NotFound(result.Error);
+    }
 }

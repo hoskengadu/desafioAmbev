@@ -1,4 +1,3 @@
-using DeveloperStore.Sales.Domain.Common;
 using FluentValidation;
 
 namespace DeveloperStore.Sales.Application.Sales;

@@ -34,4 +34,21 @@ public sealed class SaleTests
 
         Assert.Throws<DomainException>(() => sale.CancelItem(Guid.NewGuid()));
     }
+
+    [Fact]
+    public void Sale_should_recalculate_total_when_item_is_cancelled()
+    {
+        var item = new SaleItem(Guid.NewGuid(), "Product", 4, new Money(10));
+        var sale = new Sale(
+            new SaleNumber("1"),
+            DateTime.UtcNow,
+            new Customer(Guid.NewGuid(), "Customer"),
+            new Branch(Guid.NewGuid(), "Branch"),
+            [item]);
+
+        sale.CancelItem(item.Id);
+
+        Assert.True(sale.TotalAmount.Amount == 0);
+        Assert.Contains(sale.DomainEvents, e => e is ItemCancelledEvent);
+    }
 }

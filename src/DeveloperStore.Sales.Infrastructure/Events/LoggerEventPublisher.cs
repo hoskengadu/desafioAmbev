@@ -12,7 +12,8 @@ public sealed class LoggerEventPublisher : IEventPublisher
     {
         foreach (var domainEvent in domainEvents)
         {
-            _logger.LogInformation("{EventName} {@Event}", domainEvent.GetType().Name, domainEvent);
+            var eventName = domainEvent.GetType().Name.Replace("Event", string.Empty, StringComparison.Ordinal);
+            _logger.LogInformation("{EventName} {@Event}", eventName, domainEvent);
         }
 
         return Task.CompletedTask;

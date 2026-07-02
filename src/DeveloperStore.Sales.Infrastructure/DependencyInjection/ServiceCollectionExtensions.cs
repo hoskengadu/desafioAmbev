@@ -1,8 +1,6 @@
 using DeveloperStore.Sales.Application.Abstractions;
-using DeveloperStore.Sales.Application.Sales;
 using DeveloperStore.Sales.Infrastructure.Events;
 using DeveloperStore.Sales.Infrastructure.Persistence;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +16,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISaleRepository, SaleRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEventPublisher, LoggerEventPublisher>();
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateSaleCommand).Assembly));
         return services;
     }
 }

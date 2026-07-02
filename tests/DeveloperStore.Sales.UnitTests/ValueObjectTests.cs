@@ -1,5 +1,6 @@
 using DeveloperStore.Sales.Domain.Common;
 using DeveloperStore.Sales.Domain.ValueObjects;
+using FluentAssertions;
 
 namespace DeveloperStore.Sales.UnitTests;
 
@@ -9,7 +10,7 @@ public sealed class ValueObjectTests
     public void Money_should_round_to_two_decimals()
     {
         var money = new Money(10.235m);
-        Assert.Equal(10.24m, money.Amount);
+        money.Amount.Should().Be(10.24m);
     }
 
     [Fact]

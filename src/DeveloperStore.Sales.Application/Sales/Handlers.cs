@@ -21,6 +21,11 @@ public sealed class CreateSaleHandler : IRequestHandler<CreateSaleCommand, Resul
 
     public async Task<Result<Guid>> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
     {
+        if (await _repository.GetByNumberAsync(request.SaleNumber, cancellationToken) is not null)
+        {
+            return Result<Guid>.Failure("Sale number already exists.");
+        }
+
         var sale = BuildSale(request);
         await _repository.AddAsync(sale, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -55,6 +60,13 @@ public sealed class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, Resul
     {
         var sale = await _repository.GetByIdAsync(request.Id, cancellationToken);
         if (sale is null) return Result.Failure("Sale not found.");
+
+        var existingSale = await _repository.GetByNumberAsync(request.SaleNumber, cancellationToken);
+        if (existingSale is not null && existingSale.Id != request.Id)
+        {
+            return Result.Failure("Sale number already exists.");
+        }
+
         sale.Update(
             new SaleNumber(request.SaleNumber),
             request.SaleDate,

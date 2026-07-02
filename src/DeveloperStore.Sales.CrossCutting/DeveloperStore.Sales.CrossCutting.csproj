@@ -1,9 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\DeveloperStore.Sales.Application\DeveloperStore.Sales.Application.csproj" />
+    <ProjectReference Include="..\DeveloperStore.Sales.Infrastructure\DeveloperStore.Sales.Infrastructure.csproj" />
+    <PackageReference Include="MediatR" Version="14.2.0" />
+  </ItemGroup>
 </Project>

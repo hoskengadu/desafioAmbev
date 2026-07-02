@@ -1,28 +1,34 @@
-using DeveloperStore.Sales.Infrastructure.DependencyInjection;
+using DeveloperStore.Sales.CrossCutting.DependencyInjection;
 using Serilog;
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Host.UseSerilog((context, services, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration)
-                 .ReadFrom.Services(services)
-                 .Enrich.FromLogContext()
-                 .WriteTo.Console());
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddInfrastructure(builder.Configuration);
-
-var app = builder.Build();
-
-app.UseMiddleware<DeveloperStore.Sales.Api.Middleware.ExceptionHandlingMiddleware>();
-app.UseSerilogRequestLogging();
-app.UseSwagger();
-app.UseSwaggerUI();
-app.MapControllers();
-app.Run();
 
 namespace DeveloperStore.Sales.Api;
 
-public partial class Program;
+public partial class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Logging.AddFilter("LuckyPennySoftware.MediatR.License", LogLevel.None);
+
+        builder.Host.UseSerilog((context, services, configuration) =>
+            configuration.ReadFrom.Configuration(context.Configuration)
+                         .ReadFrom.Services(services)
+                         .Enrich.FromLogContext()
+                         .WriteTo.Console());
+
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddSales(builder.Configuration);
+
+        var app = builder.Build();
+
+        app.UseMiddleware<Middleware.ExceptionHandlingMiddleware>();
+        app.UseSerilogRequestLogging();
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.UseSalesDatabaseAsync().GetAwaiter().GetResult();
+        app.MapControllers();
+        app.Run();
+    }
+}
