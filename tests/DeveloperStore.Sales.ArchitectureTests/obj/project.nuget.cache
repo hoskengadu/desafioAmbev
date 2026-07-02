@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "4w+TplY3IEA=",
+  "success": false,
+  "projectFilePath": "D:\\Pessoal\\desafioAmbev\\tests\\DeveloperStore.Sales.ArchitectureTests\\DeveloperStore.Sales.ArchitectureTests.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Não é possível carregar o índice de serviço para a origem https://api.nuget.org/v3/index.json.\r\n  Foi feita uma tentativa de acesso a um soquete de uma maneira que é proibida pelas permissões de acesso. (api.nuget.org:443)\r\n  Foi feita uma tentativa de acesso a um soquete de uma maneira que é proibida pelas permissões de acesso.",
+      "projectPath": "D:\\Pessoal\\desafioAmbev\\tests\\DeveloperStore.Sales.ArchitectureTests\\DeveloperStore.Sales.ArchitectureTests.csproj",
+      "filePath": "D:\\Pessoal\\desafioAmbev\\tests\\DeveloperStore.Sales.ArchitectureTests\\DeveloperStore.Sales.ArchitectureTests.csproj",
+      "targetGraphs": []
+    }
+  ]
+}

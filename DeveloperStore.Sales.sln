@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DeveloperStore.Sales.Api/DeveloperStore.Sales.Api.csproj" />
+    <Project Path="src/DeveloperStore.Sales.Application/DeveloperStore.Sales.Application.csproj" />
+    <Project Path="src/DeveloperStore.Sales.CrossCutting/DeveloperStore.Sales.CrossCutting.csproj" />
+    <Project Path="src/DeveloperStore.Sales.Domain/DeveloperStore.Sales.Domain.csproj" />
+    <Project Path="src/DeveloperStore.Sales.Infrastructure/DeveloperStore.Sales.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DeveloperStore.Sales.ArchitectureTests/DeveloperStore.Sales.ArchitectureTests.csproj" />
+    <Project Path="tests/DeveloperStore.Sales.IntegrationTests/DeveloperStore.Sales.IntegrationTests.csproj" />
+    <Project Path="tests/DeveloperStore.Sales.UnitTests/DeveloperStore.Sales.UnitTests.csproj" />
+  </Folder>
+</Solution>
