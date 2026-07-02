@@ -9,9 +9,18 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DeveloperStore.Sales.Api\DeveloperStore.Sales.Api.csproj" />
+    <ProjectReference Include="..\..\src\DeveloperStore.Sales.Application\DeveloperStore.Sales.Application.csproj" />
+    <ProjectReference Include="..\..\src\DeveloperStore.Sales.Domain\DeveloperStore.Sales.Domain.csproj" />
+    <ProjectReference Include="..\..\src\DeveloperStore.Sales.Infrastructure\DeveloperStore.Sales.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

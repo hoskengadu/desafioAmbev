@@ -2,6 +2,8 @@ using DeveloperStore.Sales.Application.Abstractions;
 using DeveloperStore.Sales.Application.Sales;
 using DeveloperStore.Sales.Infrastructure.Events;
 using DeveloperStore.Sales.Infrastructure.Persistence;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,16 +13,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<InMemorySaleStore>();
-        services.AddScoped<ISaleRepository, InMemorySaleRepository>();
-        services.AddScoped<IUnitOfWork, InMemoryUnitOfWork>();
+        var connectionString = configuration.GetConnectionString("SalesDb") ?? "Server=localhost,1433;Database=DeveloperStoreSales;User Id=sa;Password=Your_password123;TrustServerCertificate=True";
+        services.AddDbContext<SalesDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddScoped<ISaleRepository, SaleRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEventPublisher, LoggerEventPublisher>();
-        return services;
-    }
-
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-    {
-        services.AddScoped<SaleService>();
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateSaleCommand).Assembly));
         return services;
     }
 }

@@ -1,4 +1,5 @@
 using DeveloperStore.Sales.Application.Sales;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeveloperStore.Sales.Api.Controllers;
@@ -7,42 +8,51 @@ namespace DeveloperStore.Sales.Api.Controllers;
 [Route("sales")]
 public sealed class SalesController : ControllerBase
 {
-    private readonly SaleService _service;
+    private readonly IMediator _mediator;
 
-    public SalesController(SaleService service) => _service = service;
+    public SalesController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSaleCommand command, CancellationToken cancellationToken)
     {
-        var result = await _service.CreateAsync(command, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
         return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
-        => Ok((await _service.GetAllAsync(cancellationToken)).Value);
+    {
+        var result = await _mediator.Send(new GetAllSalesQuery(), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
-        => Ok((await _service.GetByIdAsync(id, cancellationToken)).Value);
+    {
+        var result = await _mediator.Send(new GetSaleByIdQuery(id), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+    }
 
     [HttpGet("number/{saleNumber}")]
     public async Task<IActionResult> GetByNumber(string saleNumber, CancellationToken cancellationToken)
-        => Ok((await _service.GetByNumberAsync(saleNumber, cancellationToken)).Value);
+    {
+        var result = await _mediator.Send(new GetSaleByNumberQuery(saleNumber), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+    }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSaleCommand command, CancellationToken cancellationToken)
-        => Ok(await _service.UpdateAsync(command with { Id = id }, cancellationToken));
+        => Ok(await _mediator.Send(command with { Id = id }, cancellationToken));
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
-        => Ok(await _service.DeleteAsync(id, cancellationToken));
+        => Ok(await _mediator.Send(new DeleteSaleCommand(id), cancellationToken));
 
     [HttpPatch("{id:guid}/cancel")]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
-        => Ok(await _service.CancelAsync(id, cancellationToken));
+        => Ok(await _mediator.Send(new CancelSaleCommand(id), cancellationToken));
 
     [HttpPatch("{id:guid}/items/{itemId:guid}/cancel")]
     public async Task<IActionResult> CancelItem(Guid id, Guid itemId, CancellationToken cancellationToken)
-        => Ok(await _service.CancelItemAsync(id, itemId, cancellationToken));
+        => Ok(await _mediator.Send(new CancelSaleItemCommand(id, itemId), cancellationToken));
 }

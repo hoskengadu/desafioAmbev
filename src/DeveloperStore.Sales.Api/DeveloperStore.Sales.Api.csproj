@@ -9,5 +9,7 @@
     <ProjectReference Include="..\DeveloperStore.Sales.Application\DeveloperStore.Sales.Application.csproj" />
     <ProjectReference Include="..\DeveloperStore.Sales.Infrastructure\DeveloperStore.Sales.Infrastructure.csproj" />
     <ProjectReference Include="..\DeveloperStore.Sales.CrossCutting\DeveloperStore.Sales.CrossCutting.csproj" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 </Project>

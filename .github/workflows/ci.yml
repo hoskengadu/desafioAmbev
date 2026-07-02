@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore
+        run: dotnet restore DeveloperStore.Sales.slnx
+      - name: Build
+        run: dotnet build DeveloperStore.Sales.slnx -c Release --no-restore
+      - name: Test
+        run: dotnet test DeveloperStore.Sales.slnx -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/TestResults/*.trx"

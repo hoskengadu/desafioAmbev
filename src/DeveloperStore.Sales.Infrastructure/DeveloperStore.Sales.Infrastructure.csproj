@@ -7,5 +7,12 @@
   <ItemGroup>
     <ProjectReference Include="..\DeveloperStore.Sales.Application\DeveloperStore.Sales.Application.csproj" />
     <ProjectReference Include="..\DeveloperStore.Sales.Domain\DeveloperStore.Sales.Domain.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 </Project>
