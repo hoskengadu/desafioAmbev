@@ -39,3 +39,20 @@ public sealed class GetSaleByNumberQueryValidator : AbstractValidator<GetSaleByN
 {
     public GetSaleByNumberQueryValidator() => RuleFor(x => x.SaleNumber).NotEmpty();
 }
+
+public sealed class GetAllSalesQueryValidator : AbstractValidator<GetAllSalesQuery>
+{
+    public GetAllSalesQueryValidator()
+    {
+        RuleFor(x => x.PageNumber).GreaterThan(0);
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+
+        RuleFor(x => x).Custom((query, context) =>
+        {
+            if (query.SaleDateFrom.HasValue && query.SaleDateTo.HasValue && query.SaleDateTo.Value < query.SaleDateFrom.Value)
+            {
+                context.AddFailure(nameof(GetAllSalesQuery.SaleDateTo), "SaleDateTo must be greater than or equal to SaleDateFrom.");
+            }
+        });
+    }
+}

@@ -52,6 +52,18 @@ The main goal is to keep the domain independent, expressive and ready for produc
 
 - `POST /sales`
 - `GET /sales`
+  - Supports pagination, filtering and sorting through query string parameters:
+    - `PageNumber`
+    - `PageSize`
+    - `SaleNumber`
+    - `CustomerName`
+    - `BranchName`
+    - `Cancelled`
+    - `SaleDateFrom`
+    - `SaleDateTo`
+    - `SortBy`
+    - `SortDirection`
+  - Returns a paged payload with `Items`, `PageNumber`, `PageSize`, `TotalCount` and `TotalPages`.
 - `GET /sales/{id}`
 - `GET /sales/number/{saleNumber}`
 - `PUT /sales/{id}`
@@ -156,7 +168,6 @@ dotnet test DeveloperStore.Sales.sln
 ## Future Improvements
 
 - Add authentication and authorization
-- Add paging and filtering for list endpoints
 - Add optimistic concurrency
 - Expand integration coverage with more negative cases
 - Add OpenAPI examples and response schemas

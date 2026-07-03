@@ -25,12 +25,14 @@ public sealed class ExceptionHandlingMiddleware
         {
             _logger.LogWarning(ex, "Domain error");
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/problem+json";
             await context.Response.WriteAsJsonAsync(new ProblemDetails { Status = 400, Title = "Domain validation error", Detail = ex.Message });
         }
         catch (ValidationException ex)
         {
             _logger.LogWarning(ex, "Validation error");
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/problem+json";
             await context.Response.WriteAsJsonAsync(new ValidationProblemDetails(
                 ex.Errors.GroupBy(error => error.PropertyName)
                     .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray()))
@@ -44,6 +46,7 @@ public sealed class ExceptionHandlingMiddleware
         {
             _logger.LogError(ex, "Unhandled error");
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/problem+json";
             await context.Response.WriteAsJsonAsync(new ProblemDetails { Status = 500, Title = "Unexpected error", Detail = "An unexpected error occurred." });
         }
     }

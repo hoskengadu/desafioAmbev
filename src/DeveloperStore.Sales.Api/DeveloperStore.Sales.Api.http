@@ -22,7 +22,7 @@ Content-Type: application/json
 
 ###
 
-GET {{DeveloperStore.Sales.Api_HostAddress}}/sales
+GET {{DeveloperStore.Sales.Api_HostAddress}}/sales?PageNumber=1&PageSize=10&SortBy=SaleDate&SortDirection=Desc
 Accept: application/json
 
 ###

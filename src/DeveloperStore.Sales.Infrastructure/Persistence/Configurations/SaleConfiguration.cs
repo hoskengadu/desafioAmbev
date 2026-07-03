@@ -26,6 +26,8 @@ public sealed class SaleConfiguration : IEntityTypeConfiguration<Sale>
             b.Property(x => x.Name).HasColumnName("BranchName").HasMaxLength(200).IsRequired();
         });
         builder.Property(x => x.TotalAmount).HasConversion(v => v.Amount, v => new DeveloperStore.Sales.Domain.ValueObjects.Money(v)).HasColumnType("decimal(18,2)");
+        builder.HasIndex(x => x.SaleDate);
+        builder.HasIndex(x => x.Cancelled);
         builder.OwnsMany(x => x.SaleItems, items =>
         {
             items.ToTable("SaleItems");

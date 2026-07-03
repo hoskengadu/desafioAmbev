@@ -136,12 +136,30 @@ public sealed class GetSaleByNumberHandler : IRequestHandler<GetSaleByNumberQuer
         => await HandlerMapping.Map(await _repository.GetByNumberAsync(request.SaleNumber, cancellationToken));
 }
 
-public sealed class GetAllSalesHandler : IRequestHandler<GetAllSalesQuery, Result<IReadOnlyCollection<SaleResponse>>>
+public sealed class GetAllSalesHandler : IRequestHandler<GetAllSalesQuery, Result<PagedResult<SaleResponse>>>
 {
     private readonly ISaleRepository _repository;
     public GetAllSalesHandler(ISaleRepository repository) => _repository = repository;
-    public async Task<Result<IReadOnlyCollection<SaleResponse>>> Handle(GetAllSalesQuery request, CancellationToken cancellationToken)
-        => Result<IReadOnlyCollection<SaleResponse>>.Success((await _repository.GetAllAsync(cancellationToken)).Select(SaleMapper.ToResponse).ToArray());
+    public async Task<Result<PagedResult<SaleResponse>>> Handle(GetAllSalesQuery request, CancellationToken cancellationToken)
+    {
+        var pageNumber = Math.Max(request.PageNumber, 1);
+        var pageSize = Math.Clamp(request.PageSize, 1, 100);
+        var searchRequest = new SaleSearchRequest(
+            pageNumber,
+            pageSize,
+            request.SaleNumber,
+            request.CustomerName,
+            request.BranchName,
+            request.Cancelled,
+            request.SaleDateFrom,
+            request.SaleDateTo,
+            request.SortBy,
+            request.SortDirection);
+
+        var result = await _repository.SearchAsync(searchRequest, cancellationToken);
+        var items = result.Items.Select(SaleMapper.ToResponse).ToArray();
+        return Result<PagedResult<SaleResponse>>.Success(new PagedResult<SaleResponse>(items, pageNumber, pageSize, result.TotalCount));
+    }
 }
 
 static class HandlerMapping

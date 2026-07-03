@@ -62,6 +62,16 @@ public partial class InitialCreate : Migration
             unique: true);
 
         migrationBuilder.CreateIndex(
+            name: "IX_Sales_SaleDate",
+            table: "Sales",
+            column: "SaleDate");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Sales_Cancelled",
+            table: "Sales",
+            column: "Cancelled");
+
+        migrationBuilder.CreateIndex(
             name: "IX_SaleItems_SaleId",
             table: "SaleItems",
             column: "SaleId");

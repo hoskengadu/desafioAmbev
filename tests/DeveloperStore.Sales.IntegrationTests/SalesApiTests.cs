@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Bogus;
+using DeveloperStore.Sales.Application.Common;
 using DeveloperStore.Sales.Application.Sales;
 using FluentAssertions;
 
@@ -78,11 +79,21 @@ public sealed class SalesApiTests : IClassFixture<ApiFixture>
     }
 
     [Fact]
-    public async Task Get_sales_should_return_success_status()
+    public async Task Get_sales_should_return_paged_response()
     {
         var client = _fixture.Factory.CreateClient();
-        var response = await client.GetAsync("/sales");
+        await CreateSaleAsync(client, customerName: "Customer One", saleDate: DateTime.UtcNow.AddDays(-2));
+        await CreateSaleAsync(client, customerName: "Customer Two", saleDate: DateTime.UtcNow.AddDays(-1));
+
+        var response = await client.GetAsync("/sales?PageNumber=2&PageSize=1");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var page = await response.Content.ReadFromJsonAsync<PagedResult<SaleResponse>>();
+        page.Should().NotBeNull();
+        page!.PageNumber.Should().Be(2);
+        page.PageSize.Should().Be(1);
+        page.TotalCount.Should().BeGreaterOrEqualTo(2);
+        page.Items.Should().HaveCount(1);
     }
 
     [Fact]
@@ -103,23 +114,65 @@ public sealed class SalesApiTests : IClassFixture<ApiFixture>
         sale!.SaleNumber.Should().Be(saleNumber);
     }
 
-    private static async Task<Guid> CreateSaleAsync(HttpClient client)
+    [Fact]
+    public async Task Get_sales_should_filter_by_customer_name()
     {
-        var payload = BuildPayload(quantity: 4, unitPrice: 10m);
+        var client = _fixture.Factory.CreateClient();
+        await CreateSaleAsync(client, customerName: "Unique Customer");
+        await CreateSaleAsync(client, customerName: "Other Customer");
+
+        var response = await client.GetAsync("/sales?CustomerName=Unique%20Customer");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var page = await response.Content.ReadFromJsonAsync<PagedResult<SaleResponse>>();
+        page.Should().NotBeNull();
+        page!.Items.Should().ContainSingle();
+        page.Items.Single().CustomerName.Should().Be("Unique Customer");
+    }
+
+    [Fact]
+    public async Task Get_sales_should_sort_by_sale_date_desc()
+    {
+        var client = _fixture.Factory.CreateClient();
+        await CreateSaleAsync(client, saleDate: DateTime.UtcNow.AddDays(-2));
+        await CreateSaleAsync(client, saleDate: DateTime.UtcNow.AddDays(-1));
+
+        var response = await client.GetAsync("/sales?SortBy=SaleDate&SortDirection=Desc&PageSize=10");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var page = await response.Content.ReadFromJsonAsync<PagedResult<SaleResponse>>();
+        page.Should().NotBeNull();
+        page!.Items.Count.Should().BeGreaterOrEqualTo(2);
+        page.Items[0].SaleDate.Should().BeOnOrAfter(page.Items[1].SaleDate);
+    }
+
+    [Fact]
+    public async Task Get_sales_should_reject_invalid_page_size()
+    {
+        var client = _fixture.Factory.CreateClient();
+
+        var response = await client.GetAsync("/sales?PageSize=0");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    private static async Task<Guid> CreateSaleAsync(HttpClient client, string? customerName = null, DateTime? saleDate = null)
+    {
+        var payload = BuildPayload(quantity: 4, unitPrice: 10m, customerName: customerName, saleDate: saleDate);
 
         var response = await client.PostAsJsonAsync("/sales", payload);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<Guid>())!;
     }
 
-    private static SalePayload BuildPayload(int quantity, decimal unitPrice)
+    private static SalePayload BuildPayload(int quantity, decimal unitPrice, string? customerName = null, DateTime? saleDate = null)
     {
         var faker = new Faker();
         return new SalePayload(
             $"S-{faker.Random.AlphaNumeric(10).ToUpperInvariant()}",
-            DateTime.UtcNow,
+            saleDate ?? DateTime.UtcNow,
             faker.Random.Guid(),
-            faker.Name.FullName(),
+            customerName ?? faker.Name.FullName(),
             faker.Random.Guid(),
             faker.Company.CompanyName(),
             [

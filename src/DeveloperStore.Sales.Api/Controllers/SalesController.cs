@@ -1,4 +1,5 @@
 using DeveloperStore.Sales.Application.Sales;
+using DeveloperStore.Sales.Application.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,10 +25,11 @@ public sealed class SalesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PagedResult<SaleResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll([FromQuery] GetAllSalesQuery query, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetAllSalesQuery(), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+        var result = await _mediator.Send(query, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpGet("{id:guid}")]
