@@ -1,4 +1,4 @@
-name: ci
+﻿name: ci
 
 on:
   pull_request:
@@ -15,11 +15,11 @@ jobs:
         with:
           dotnet-version: 9.0.x
       - name: Restore
-        run: dotnet restore DeveloperStore.Sales.sln
+        run: dotnet restore Ambev.DeveloperEvaluation.sln
       - name: Build
-        run: dotnet build DeveloperStore.Sales.sln -c Release --no-restore
+        run: dotnet build Ambev.DeveloperEvaluation.sln -c Release --no-restore
       - name: Test
-        run: dotnet test DeveloperStore.Sales.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+        run: dotnet test Ambev.DeveloperEvaluation.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:

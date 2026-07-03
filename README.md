@@ -1,4 +1,4 @@
-# DeveloperStore Sales API
+﻿# DeveloperStore Sales API
 
 Sales API built with .NET 9, DDD, Clean Architecture, CQRS, EF Core and SQL Server.
 
@@ -10,33 +10,37 @@ The main goal is to keep the domain independent, expressive and ready for produc
 
 ## Architecture
 
-- `DeveloperStore.Sales.Domain`
+- `Ambev.DeveloperEvaluation.Domain`
   - Aggregate Root: `Sale`
   - Entity: `SaleItem`
   - Value Objects: `Money`, `Percentage`, `SaleNumber`, `Customer`, `Branch`
   - Domain rules and domain events
-- `DeveloperStore.Sales.Application`
+- `Ambev.DeveloperEvaluation.Application`
   - CQRS commands and queries
   - FluentValidation validators
   - MediatR handlers
   - Response models and result pattern
-- `DeveloperStore.Sales.Infrastructure`
+- `Ambev.DeveloperEvaluation.Common`
+  - Cross-cutting result types
+  - MediatR validation behavior
+- `Ambev.DeveloperEvaluation.ORM`
   - EF Core mapping
   - SQL Server persistence
   - Repository pattern
   - Unit of Work
   - Structured domain event logging
-- `DeveloperStore.Sales.CrossCutting`
+- `Ambev.DeveloperEvaluation.IoC`
   - Composition root
   - Service registration
-- `DeveloperStore.Sales.Api`
+- `Ambev.DeveloperEvaluation.WebApi`
   - REST controllers
   - Global exception middleware
   - Swagger/OpenAPI
   - Serilog
 - `tests`
-  - Unit tests
+  - Functional tests
   - Integration tests
+  - Unit tests
   - Architecture tests
 
 ## Business Rules
@@ -71,14 +75,14 @@ The main goal is to keep the domain independent, expressive and ready for produc
 - `PATCH /sales/{id}/cancel`
 - `PATCH /sales/{id}/items/{itemId}/cancel`
 
-Examples are available in [`DeveloperStore.Sales.Api.http`](src/DeveloperStore.Sales.Api/DeveloperStore.Sales.Api.http).
+Examples are available in [`Ambev.DeveloperEvaluation.WebApi.http`](src/Ambev.DeveloperEvaluation.WebApi/Ambev.DeveloperEvaluation.WebApi.http).
 
 ## How to Run
 
 ### Local
 
 ```powershell
-dotnet run --project src/DeveloperStore.Sales.Api
+dotnet run --project src/Ambev.DeveloperEvaluation.WebApi
 ```
 
 ### Docker
@@ -88,7 +92,7 @@ docker compose up --build
 ```
 
 The compose file starts:
-- API
+- Web API
 - SQL Server
 
 ## Database
@@ -105,14 +109,14 @@ When running with Docker Compose, the API container overrides this value to use 
 
 ## Migrations
 
-The application applies migrations on startup through the `CrossCutting` composition layer.
+The application applies migrations on startup through the `IoC` composition layer.
 
 Recommended flow:
 
 ```powershell
 dotnet tool install --global dotnet-ef
-dotnet ef migrations add InitialCreate --project src/DeveloperStore.Sales.Infrastructure --startup-project src/DeveloperStore.Sales.Api
-dotnet ef database update --project src/DeveloperStore.Sales.Infrastructure --startup-project src/DeveloperStore.Sales.Api
+dotnet ef migrations add InitialCreate --project src/Ambev.DeveloperEvaluation.ORM --startup-project src/Ambev.DeveloperEvaluation.WebApi
+dotnet ef database update --project src/Ambev.DeveloperEvaluation.ORM --startup-project src/Ambev.DeveloperEvaluation.WebApi
 ```
 
 The migration is also applied automatically when the API starts.
@@ -122,25 +126,31 @@ The migration is also applied automatically when the API starts.
 ### Unit tests
 
 ```powershell
-dotnet test tests/DeveloperStore.Sales.UnitTests/DeveloperStore.Sales.UnitTests.csproj
+dotnet test tests/Ambev.DeveloperEvaluation.Unit/Ambev.DeveloperEvaluation.Unit.csproj
 ```
 
 ### Integration tests
 
 ```powershell
-dotnet test tests/DeveloperStore.Sales.IntegrationTests/DeveloperStore.Sales.IntegrationTests.csproj
+dotnet test tests/Ambev.DeveloperEvaluation.Integration/Ambev.DeveloperEvaluation.Integration.csproj
+```
+
+### Functional tests
+
+```powershell
+dotnet test tests/Ambev.DeveloperEvaluation.Functional/Ambev.DeveloperEvaluation.Functional.csproj
 ```
 
 ### Architecture tests
 
 ```powershell
-dotnet test tests/DeveloperStore.Sales.ArchitectureTests/DeveloperStore.Sales.ArchitectureTests.csproj
+dotnet test tests/Ambev.DeveloperEvaluation.ArchitectureTests/Ambev.DeveloperEvaluation.ArchitectureTests.csproj
 ```
 
 ### Full suite
 
 ```powershell
-dotnet test DeveloperStore.Sales.sln
+dotnet test Ambev.DeveloperEvaluation.sln
 ```
 
 ## Quality Notes
@@ -151,8 +161,8 @@ dotnet test DeveloperStore.Sales.sln
 - Global exception handling returning `ProblemDetails`
 - CQRS through MediatR
 - Domain rules remain inside the domain model
-- API does not reference Infrastructure directly; the composition root handles it
-- Test suite split into unit, integration and architecture layers
+- API does not reference ORM directly; the composition root handles it
+- Test suite split into functional, integration, unit and architecture layers
 - Target coverage is 80% or higher
 
 ## Suggested Flow
