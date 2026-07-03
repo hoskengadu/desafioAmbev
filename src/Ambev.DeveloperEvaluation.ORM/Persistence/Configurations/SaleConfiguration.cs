@@ -41,7 +41,9 @@ public sealed class SaleConfiguration : IEntityTypeConfiguration<Sale>
             items.Property(x => x.DiscountAmount).HasConversion(v => v.Amount, v => new Ambev.DeveloperEvaluation.Domain.ValueObjects.Money(v)).HasColumnType("decimal(18,2)");
             items.Property(x => x.Total).HasConversion(v => v.Amount, v => new Ambev.DeveloperEvaluation.Domain.ValueObjects.Money(v)).HasColumnType("decimal(18,2)");
         });
-        builder.Navigation(x => x.SaleItems).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(x => x.SaleItems)
+            .HasField("_items")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
 
